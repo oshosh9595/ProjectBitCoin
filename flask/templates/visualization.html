@@ -1,0 +1,6 @@
+<div>
+    <p>예측 결과</p>
+    {% if prediction %}
+        {% set processed_data = visualization(prediction) %}
+    {% endif %}
+</div>
