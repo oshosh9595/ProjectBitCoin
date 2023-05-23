@@ -6,13 +6,13 @@ import pandas as pd
 import threading
 from model import model_prediction
 from database import mysql_connection
-from testapi import collect_realtime_data
+from upbitapi import collect_realtime_data
 
 logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 
 @app.route('/')
-def test():
+def job():
     logging.info("데이터 수집 시작")
     collect_realtime_data()
 
@@ -26,14 +26,14 @@ def collect_and_predict():
     mysql_connection(y_pred_dict)
 
 def schedule_job():
-    schedule.every(1).minutes.do(collect_and_predict)
+    schedule.every(3).minutes.do(collect_and_predict) #1분 마다 collect_and_predict 실행    q
 
     def run_schedule():
         while True:
-            schedule.run_pending()
-            time.sleep(1)
+            schedule.run_pending() # 스켈줄링은 무한루프 실행
+            time.sleep(1) # 1초대기
 
-    schedule_thread = threading.Thread(target=run_schedule)
+    schedule_thread = threading.Thread(target=run_schedule) # run_schedule 쓰레드
     schedule_thread.start()
 
 if __name__ == "__main__":

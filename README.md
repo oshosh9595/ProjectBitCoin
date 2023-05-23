@@ -176,3 +176,8 @@ jupyter lab
 
 > 예측 결과 시각화:
 
+
+# 진행 상황
+  > upbitapi 로 css 파일 수집
+  > model 수정
+  > DB 연결확인 및 데이터 넣기
