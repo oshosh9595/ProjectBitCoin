@@ -1,5 +1,4 @@
 import pymysql
-from model import model_prediction
 
 def mysql_connection(y_pred_dict):
     # MySql 연결 설정
@@ -14,11 +13,10 @@ def mysql_connection(y_pred_dict):
     cursor = connection.cursor()
 
     # 데이터 삽입 쿼리
-    sql = "INSERT INTO predictions (dateday, prediction) VALUES (%s, %s)"
+    sql = "INSERT INTO predictions (trade_date, prediction) VALUES (%s, %s)"
 
     # 데이터 삽입 실행
-    for date, pred in zip(y_pred_dict['dateday'], y_pred_dict['prediction']):
-        cursor.execute(sql, (date, pred))
+    cursor.execute(sql, (y_pred_dict['trade_date'][0], y_pred_dict['prediction'][0]))
 
     # 변경 사항 저장
     connection.commit()

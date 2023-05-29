@@ -26,16 +26,13 @@ def collect_and_predict():
     mysql_connection(y_pred_dict)
 
 def schedule_job():
-    schedule.every(3).minutes.do(collect_and_predict) #1분 마다 collect_and_predict 실행    q
+    schedule.every(1).minutes.do(collect_and_predict).tag('collect_and_predict') 
+    # 3분마다 collect_and_predict 실행 tag는 안됨
+    while True:
+        schedule.run_pending() # 스케줄링된 작업 실행
+        time.sleep(1) # 1초 대기
 
-    def run_schedule():
-        while True:
-            schedule.run_pending() # 스켈줄링은 무한루프 실행
-            time.sleep(1) # 1초대기
-
-    schedule_thread = threading.Thread(target=run_schedule) # run_schedule 쓰레드
-    schedule_thread.start()
-
+schedule_thread = threading.Thread(target=schedule_job) # schedule_job 쓰레드
+schedule_thread.start()
 if __name__ == "__main__":
-    schedule_job()
-    app.run(debug=True)
+    app.run(debug=False, threaded=True)

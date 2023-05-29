@@ -9,15 +9,8 @@ from sklearn.model_selection import train_test_split
 from keras.models import Sequential
 from keras.layers import Conv1D, MaxPooling1D, LSTM, Dense, Flatten, Dropout, Reshape
 
-# logging 설정 추가
-logging.basicConfig(level=logging.INFO)
-
 def model_prediction(data):
     logging.info("모델 시작")
-
-    if data.empty:
-        logging.info("데이터 비어있습니다")
-        return data
 
     # 데이터 프레임으로 변환
     df = pd.DataFrame(data)
@@ -67,7 +60,7 @@ def model_prediction(data):
 
     # CNN 모델과 LSTM 모델
     n_features = len(scale_cols)
-
+    
     model = Sequential()
     model.add(Conv1D(filters=64, kernel_size=3, activation='relu', input_shape=(n_timesteps, n_features)))
     model.add(Dropout(0.025))
@@ -82,7 +75,7 @@ def model_prediction(data):
     model.compile(loss='mse', optimizer='adam')
 
     # 모델 학습하기
-    history = model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=100, batch_size=32) #두번 도는거 이유 찾아야함
+    #history = model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=100, batch_size=32)
 
     # 모델 평가하기
     score = model.evaluate(X_test, y_test)
@@ -93,13 +86,10 @@ def model_prediction(data):
         org_x_np = np.asarray(org_x)
         x_np = np.asarray(x)
         return (x_np * (org_x_np.max() - org_x_np.min() + 1e-7)) + org_x_np.min()
+
     # 예측 결과 역변환
     y_pred_reshaped = np.reshape(y_pred, (-1, 1))
     y_pred_original = reverse_min_max_scaling(df['trade_price'], y_pred_reshaped)
-
-    #last_sequence = scaled[-n_timesteps:]
-    #last_sequence = np.expand_dims(last_sequence, axis=0)
-    #future_pred = model.predict(last_sequence)
 
     # 미래 날짜 계산
     current_date = df.index[-1].to_pydatetime()
@@ -107,7 +97,8 @@ def model_prediction(data):
 
     # 예측 결과를 저장할 딕셔너리
     y_pred_dict = {
-        'dateday': future_dates,
+        'trade_date': future_dates,
         'prediction': [y_pred_original.flatten()[0]]
     }
+
     return y_pred_dict
