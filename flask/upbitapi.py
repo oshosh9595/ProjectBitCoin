@@ -3,7 +3,7 @@ import time
 import pandas as pd
 
 MAX_DATA_COUNT = 30
-CSV_FILE_PATH = "data.csv"
+CSV_FILE_PATH = "../data/data.csv"
 COLUMN_NAMES = ['candle_date_time_kst', 'opening_price', 'high_price', 'low_price', 'trade_price', 'candle_acc_trade_price', 'candle_acc_trade_volume']
 
 def upbit_api():

@@ -2,7 +2,6 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 import signal
-import os
 
 url = "https://search.naver.com/search.naver?query=비트코인&where=news"
 articles = []
@@ -25,13 +24,9 @@ def start_one():
         if signal.getsignal(signal.SIGINT) is not signal.default_int_handler:
             print("사용자에 의해 프로그램이 중단되었습니다.")
             break
-            
+    
     if articles:
-        save_dir = './data'
-        os.makedirs(save_dir, exist_ok=True)
-        file_path = os.path.join(save_dir, 'news.csv')
-
-        with open(file_path, 'w', newline='', encoding='utf-8') as csvfile:
+        with open('./data/news.csv', 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['뉴스 제목', '뉴스 내용', '뉴스 날짜'])
             for article in articles:

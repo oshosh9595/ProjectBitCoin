@@ -75,7 +75,7 @@ def model_prediction(data):
     model.compile(loss='mse', optimizer='adam')
 
     # 모델 학습하기
-    #history = model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=100, batch_size=32)
+    history = model.fit(X_train, y_train, validation_data=(X_val, y_val), epochs=100, batch_size=32)
 
     # 모델 평가하기
     score = model.evaluate(X_test, y_test)
