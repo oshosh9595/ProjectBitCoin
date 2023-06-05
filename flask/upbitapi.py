@@ -26,7 +26,7 @@ def collect_realtime_data():
         data = upbit_api()
         save_data_to_csv(data)
         check_and_delete_excess_data()
-        time.sleep(1)
+        time.sleep(60)
 
 def check_and_delete_excess_data():
     df = pd.read_csv(CSV_FILE_PATH)

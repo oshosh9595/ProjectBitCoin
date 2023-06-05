@@ -21,11 +21,23 @@ def get_bitcoin_data(start_date, end_date):
             df = df.sort_values('candle_date_time_kst')
             
             # 기존 파일이 존재하는지 확인
-            if os.path.isfile("../data/bitcoin2023_t.csv"):
-                df_existing = pd.read_csv("../data/bitcoin2023_t.csv")
-                df = pd.concat([df_existing, df])
+            file_path = "../data/bitcoinapi.csv"  # 파일 경로
+            if os.path.isfile(file_path):
+                # 기존 파일을 청크 단위로 읽어오기
+                df_existing_chunks = pd.read_csv(file_path, chunksize=10000)
+                df_existing_list = []
+                for chunk in df_existing_chunks:
+                    df_existing_list.append(chunk)
+                df_existing = pd.concat(df_existing_list)
+                df_existing.reset_index(drop=True, inplace=True)
+                
+                # 중복 제외하고 새로운 데이터 추가
+                df_existing = pd.concat([df_existing, df])
+            else:
+                df_existing = df
             
-            df.to_csv("../data/bitcoin2023_t.csv", mode='w', header=True, index=False)
+            # 중복 제외한 데이터 저장
+            df_existing.to_csv(file_path, mode='w', header=True, index=False)
             
             print(f"Bitcoin data from {data[0]['candle_date_time_kst']} is collected.")
             
@@ -33,7 +45,7 @@ def get_bitcoin_data(start_date, end_date):
                 break
             
             start_date = data[-1]['candle_date_time_utc']
-            url = f"https://api.upbit.com/v1/candles/minutes/5?market=KRW-BTC&to={start_date}&count=200"
+            url = f"https://api.upbit.com/v1/candles/minutes/1?market=KRW-BTC&to={start_date}&count=200"
         else:
             print("Error: Failed to collect bitcoin data.")
         
@@ -41,5 +53,5 @@ def get_bitcoin_data(start_date, end_date):
 
 if __name__ == '__main__':
     start_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    end_date = "2023-01-01T00:00:00Z"
+    end_date = "2021-01-01T00:00:00Z"
     get_bitcoin_data(start_date, end_date)

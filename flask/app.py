@@ -1,56 +1,35 @@
-import requests
-from bs4 import BeautifulSoup
-import csv
-import signal
-import os
+from flask import Flask, render_template, request, jsonify
+import schedule
+import time
+import logging
+import pandas as pd
+import threading
+from model.prediction_model import model_prediction
+from database import mysql_connection
+from upbitapi import collect_realtime_data
+logging.basicConfig(level=logging.INFO)
+app = Flask(__name__)
+@app.route('/')
+def job():
+    logging.info("데이터 수집 시작")
+    collect_realtime_data()
+def collect_and_predict():
+    logging.info("collect_and_predict 실행")
+    # 데이터 로드
+    data = pd.read_csv("../data/data.csv")
+    # 모델에 데이터 삽입
+    y_pred_dict = model_prediction(data)
+    # 데이터베이스에 삽입
+    mysql_connection(y_pred_dict)
 
-url = "https://search.naver.com/search.naver?query=비트코인&where=news"
-articles = []
-
-def start_one():
-    start = 1  # 시작 페이지 번호
+def schedule_job():
+    schedule.every(30).minutes.do(collect_and_predict).tag('collect_and_predict') 
+    # 3분마다 collect_and_predict 실행 tag는 안됨
     while True:
-        page_url = f"{url}&start={start}"
-        response = requests.get(page_url)
-        soup = BeautifulSoup(response.content, 'html.parser')
-        news_area = soup.find_all('div', class_='news_area')
+        schedule.run_pending() # 스케줄링된 작업 실행
+        time.sleep(1) # 1초 대기
 
-        if not news_area:  # news_area가 비어있으면 마지막 페이지라고 가정
-            break
-
-        articles.extend(news_area)
-        start += 10  # 다음 페이지로 이동
-
-        # 사용자 입력 감지
-        if signal.getsignal(signal.SIGINT) is not signal.default_int_handler:
-            print("사용자에 의해 프로그램이 중단되었습니다.")
-            break
-            
-    if articles:
-        save_dir = './data'
-        os.makedirs(save_dir, exist_ok=True)
-        file_path = os.path.join(save_dir, 'news.csv')
-
-        with open(file_path, 'w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(['뉴스 제목', '뉴스 내용', '뉴스 날짜'])
-            for article in articles:
-                news_title_elem = article.find('a', class_='news_tit')
-                news_title = news_title_elem.text.strip() if news_title_elem else ""
-
-                news_content_elem = article.find('a', class_='api_txt_lines dsc_txt_wrap')
-                news_content = news_content_elem.text.strip() if news_content_elem else ""
-
-                news_date_elem = article.find('span', class_='info')
-                news_date = news_date_elem.text.strip() if news_date_elem else ""
-
-                writer.writerow([news_title, news_content, news_date])
-
-        print("뉴스 제목, 내용, 날짜가 성공적으로 저장되었습니다.")
-    else:
-        print("수집된 뉴스가 없습니다.")
-
-# KeyboardInterrupt 시그널 핸들러 등록
-signal.signal(signal.SIGINT, signal.default_int_handler)
-
-start_one()
+schedule_thread = threading.Thread(target=schedule_job) # schedule_job 쓰레드
+schedule_thread.start()
+if __name__ == "__main__":
+    app.run(debug=False, threaded=True)
