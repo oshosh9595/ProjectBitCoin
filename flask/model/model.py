@@ -9,7 +9,7 @@ from keras.layers import Conv1D, LSTM, Dense, Dropout
 from keras.callbacks import EarlyStopping
 from keras.optimizers import Adam
 
-existing_data = pd.read_csv("../data/bitcoin2023.csv")
+existing_data = pd.read_csv("flask/data/bitcoin2023.csv")
 
 df = pd.DataFrame(existing_data)
 

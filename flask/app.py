@@ -16,7 +16,7 @@ def job():
 def collect_and_predict():
     logging.info("collect_and_predict 실행")
     # 데이터 로드
-    data = pd.read_csv("../data/data.csv")
+    data = pd.read_csv("flask/data/data.csv")
     # 모델에 데이터 삽입
     y_pred_dict = model_prediction(data)
     # 데이터베이스에 삽입

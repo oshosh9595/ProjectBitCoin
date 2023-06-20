@@ -21,7 +21,7 @@ def get_bitcoin_data(start_date, end_date):
             df = df.sort_values('candle_date_time_kst')
             
             # 기존 파일이 존재하는지 확인
-            file_path = "../data/bitcoinapi.csv"  # 파일 경로
+            file_path = "flask/data/bitcoinapi.csv"  # 파일 경로
             if os.path.isfile(file_path):
                 # 기존 파일을 청크 단위로 읽어오기
                 df_existing_chunks = pd.read_csv(file_path, chunksize=10000)

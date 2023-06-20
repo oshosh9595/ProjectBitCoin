@@ -10,7 +10,7 @@ def model_prediction(data):
     logging.info("모델 시작")
 
     # 기존 CSV 파일 읽어오기
-    existing_data = pd.read_csv('../data/bitcoin2023.csv')
+    existing_data = pd.read_csv('flask/data/bitcoin2023.csv')
     # 신규 데이터
     new_data = pd.DataFrame(data)
 
