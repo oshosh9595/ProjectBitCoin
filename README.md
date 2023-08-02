@@ -50,13 +50,11 @@ jupyter lab
 - [ ] CNN(2D)
   - [ ] Conv2D Historical Implementation
   - [ ] Conv2D Forecasting
-- [ ] LSTM
-- [ ] CNN+LSTM
   - LSTM의 구조를 생각하면서 Conv1D or Conv2D lqyer가 넘어가는지, 안으로 들어가는지 생각해볼 것.
 - [ ] Prophet
 - [ ] GRU
-- [ ] CNN + LSTM
-- [ ] Flask
+- [x] CNN + LSTM
+- [x] Flask
 
 ## Flask
 
